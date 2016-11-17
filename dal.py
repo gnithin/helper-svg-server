@@ -6,6 +6,9 @@ class TestData(ndb.Model):
     content = ndb.StringProperty()
     timestamp = ndb.DateTimeProperty(auto_now_add=True)
     # TODO: Should I store the parsed messages here?
+    # Right now, parsing only when it's requested.
+    # Come back here when you figure out how to properly parse them
+    # No. to times the request is parser <<<<< No. of times it's requested
 
     @classmethod
     def query_message(cls):
@@ -14,10 +17,14 @@ class TestData(ndb.Model):
     @classmethod
     def get_latest_entry(cls):
         try:
-            return cls.query().order(-cls.timestamp).fetch(1, offset=0)
+            data = cls.query().order(-cls.timestamp).fetch(1, offset=0)
+            if len(data):
+                return data[0]
+            return False
         except Exception as e:
             logging.info("Error when fetching the latest entry")
             logging.info(str(e))
+        return False
 
 
 class DAL:

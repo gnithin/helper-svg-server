@@ -1,6 +1,7 @@
 from lib.bottle import Bottle, request
 import logging
 from dal import DAL
+from utils import Utils
 
 bottle = Bottle()
 
@@ -23,15 +24,29 @@ def post():
             "content" : all_content
         }
 
-    ins_status = DAL.insert_test_data(**add_data)
-
     # The return message is just for viewing in circleci
-    return "Added test data!" if ins_status else "Failed adding test data!"
+    return Utils.resp_json(
+        *(
+            [1, "Added test data!"] if DAL.insert_test_data(**add_data)
+            else [-1, "Failed adding test data!"]
+        )
+    )
 
 
 @bottle.route('/stats')
 def stats():
     test_data = DAL.get_latest_test_data()
-    logging.info("Got return val")
+    if not test_data:
+        return Utils.resp_json(-1, "No data available")
+
+    try:
+        content = test_data.content
+        timestamp = test_data.timestamp
+
+        # TODO: This needs to be removed from here
+        final_content = Utils.parse_content(content, timestamp)
+    except Exception as e:
+        logging.info(str(e))
+
     # Some kind of cleansing is required here
-    return str(test_data)
+    return Utils.resp_json(1, "success", contents=final_content)
