@@ -13,7 +13,7 @@ def index():
 
 @bottle.route('/post', method="POST")
 def post():
-    all_content_key = "all_output"
+    all_content_key = "allOutput"
     all_content = request.forms.get(all_content_key)
     logging.info("All Content")
     logging.info(all_content)
