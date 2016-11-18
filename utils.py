@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 import re
-# import logging
+import logging
 # from pprint import pprint
 
 
@@ -13,7 +13,7 @@ class Utils:
         return json.dumps(kwargs, default=cls.json_serial)
 
     @classmethod
-    def parse_content(cls, content, timestamp):
+    def parse_content(cls, content):
         def parse_tests(tests):
             tests = tests.strip(" \n")
 
@@ -60,6 +60,7 @@ class Utils:
                     })
             return all_bm_data
 
+        # Function logic starts here
         content = content.strip()
         final_resp = {}
 
@@ -70,6 +71,10 @@ class Utils:
             flags=re.MULTILINE
         )
 
+        logging.info("*" * 50)
+        logging.info(test_constituents)
+        logging.info(len(test_constituents))
+
         if len(test_constituents) <= 3:
             tests, status, benchmarks = test_constituents
             status = status.strip().lower()
@@ -79,14 +84,14 @@ class Utils:
             else:
                 bm_results = {}
 
-            print("Test and Benchmarks - ")
+            logging.info("Test and Benchmarks - ")
 
             final_resp["tests"] = tests_results
             final_resp["bm"] = bm_results
             final_resp["test_pass"] = status == "pass"
         else:
-            print("Fail: Number of consitituents - " +
-                  str(len(test_constituents)))
+            logging.info("Fail: Number of consitituents - " +
+                         str(len(test_constituents)))
 
         return final_resp
 

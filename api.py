@@ -1,6 +1,6 @@
 from lib.bottle import Bottle, request
 import logging
-# from dal import DAL
+from dal import DAL
 from utils import Utils
 from pprint import pprint
 
@@ -15,14 +15,18 @@ def index():
 @bottle.route('/post', method="POST")
 def post():
     all_content_key = "allOutput"
+    timestamp_key = "timestamp"
     all_content = request.forms.get(all_content_key)
-    logging.info("All Content")
     logging.info(all_content)
+    timestamp = request.forms.get(timestamp_key)
+    if not timestamp:
+        timestamp = ""
 
     add_data = {}
     if all_content:
         add_data = {
-            "content" : all_content
+            "content" : all_content,
+            "timestamp": timestamp
         }
 
     # The return message is just for viewing in circleci
@@ -40,17 +44,7 @@ def stats():
     if not test_data:
         return Utils.resp_json(-1, "No data available")
 
-    try:
-        content = test_data.content
-        timestamp = test_data.timestamp
-
-        # TODO: This needs to be removed from here
-        final_content = Utils.parse_content(content, timestamp)
-    except Exception as e:
-        logging.info(str(e))
-
-    # Some kind of cleansing is required here
-    return Utils.resp_json(1, "success", contents=final_content)
+    return Utils.resp_json(1, "success", contents=test_data)
 
 if __name__ == "__main__":
     # Just testing out the parser bit
