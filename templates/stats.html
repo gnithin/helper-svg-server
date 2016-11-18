@@ -1,18 +1,60 @@
 <?xml version="1.0" standalone="no"?>
 <?xml-stylesheet type="text/css" href="/static/stats_style.css"?>
 <svg xmlns="http://www.w3.org/2000/svg">
-  <foreignObject x="10" y="10" width="100" height="150">
+  <foreignObject x="10" y="10" width="400" height="1200">
     <body xmlns="http://www.w3.org/1999/xhtml">
         <table class="table">
-            <thead>
-                <td>
-                    H1
-                </td>
-                <td>
-                    H2
-                </td>
-            </thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Time
+                </th>
+                <th>
+                    Pass
+                </th>
+            </tr>
             <!-- Create a looping thingy -->
+            {% for test_item in test_data.structured_content.tests %}
+                <tr>
+                    <td>
+                        {{ test_item.test_name }}
+                    </td>
+                    <td>
+                        {{ test_item.time_taken }}
+                    </td>
+                    <td>
+                        {{ test_item.test_pass }}
+                    </td>
+                </tr>
+            {% endfor %}
+            {% if test_data.structured_content.bm|length > 0 %}
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Iterations
+                    </th>
+                    <th>
+                        Rate
+                    </th>
+                </tr>
+                {% for bm_item in test_data.structured_content.bm %}
+                    <tr>
+                        <td>
+                            {{ bm_item.bm_name }}
+                        </td>
+                        <td>
+                            {{ bm_item.iterations }}
+                        </td>
+                        <td>
+                            {{ bm_item.rate }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
         </table>
     </body>
   </foreignObject>
