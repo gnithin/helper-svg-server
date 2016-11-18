@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 import re
 # import logging
-from pprint import pprint
+# from pprint import pprint
 
 
 class Utils:
@@ -31,12 +31,16 @@ class Utils:
                 status_split = status_line.split(" ")
                 if len(status_split) > 3:
                     test_name = status_split[2]
-                    status = status_split[1].strip(":")
+                    status = status_split[1].strip(":").lower()
                     time_taken = status_split[-1].strip("()")
+                    metadata = {}
+                    if status == "fail":
+                        metadata["error"] = "\n".join(status_split[1:])
                     all_test_data.append({
                         "test_name": test_name,
-                        "status": status,
-                        "time_taken": time_taken
+                        "test_pass": status == "pass",
+                        "time_taken": time_taken,
+                        "metadata": metadata
                     })
 
             return all_test_data
@@ -60,15 +64,15 @@ class Utils:
         final_resp = {}
 
         test_constituents = re.split(
-            r'^\s*(?:PASS|FAIL)',
+            r'^\s*(PASS|FAIL)',
             content,
             maxsplit=1,
             flags=re.MULTILINE
         )
-        pprint(test_constituents)
 
-        if len(test_constituents) <= 2:
-            tests, benchmarks = test_constituents
+        if len(test_constituents) <= 3:
+            tests, status, benchmarks = test_constituents
+            status = status.strip().lower()
             tests_results = parse_tests(tests)
             if tests_results != {}:
                 bm_results = parse_benchmarks(benchmarks)
@@ -76,11 +80,10 @@ class Utils:
                 bm_results = {}
 
             print("Test and Benchmarks - ")
-            pprint(tests_results)
-            pprint(bm_results)
 
             final_resp["tests"] = tests_results
             final_resp["bm"] = bm_results
+            final_resp["test_pass"] = status == "pass"
         else:
             print("Fail: Number of consitituents - " +
                   str(len(test_constituents)))
