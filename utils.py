@@ -14,20 +14,66 @@ class Utils:
 
     @classmethod
     def parse_content(cls, content, timestamp):
+        def parse_tests(tests):
+            tests = tests.strip(" \n")
+
+            # Get the test results
+            tests_list = [
+                s.strip(" \n")
+                for s in
+                re.split(r'^\s*===\s*RUN\s+.*', tests, flags=re.MULTILINE)
+                if s.strip(" \n") != ""
+            ]
+
+            all_test_data = []
+            for status in tests_list:
+                status_line = status.split("\n")[0]
+                status_split = status_line.split(" ")
+                if len(status_split) > 3:
+                    test_name = status_split[2]
+                    status = status_split[1].strip(":")
+                    time_taken = status_split[-1].strip("()")
+                    all_test_data.append({
+                        "test_name": test_name,
+                        "status": status,
+                        "time_taken": time_taken
+                    })
+
+            return all_test_data
+
+        def parse_benchmarks(bm):
+            bm = bm.strip(" \n")
+
+            all_bm_data = []
+            for bm_line in bm.split('\n'):
+                bm_line = bm_line.strip(" \n")
+                bm_contents = re.split(r'[\t\s\n]{2,}', bm_line)
+                if len(bm_contents) >= 3:
+                    all_bm_data.append({
+                        "bm_name" : bm_contents[0],
+                        "iterations": bm_contents[1],
+                        "rate": bm_contents[2]
+                    })
+            return all_bm_data
+
         content = content.strip()
         final_resp = {}
 
         test_constituents = re.split(
             r'^\s*(?:PASS|FAIL)',
             content,
+            maxsplit=1,
             flags=re.MULTILINE
         )
         pprint(test_constituents)
 
-        if len(test_constituents) == 2:
+        if len(test_constituents) <= 2:
             tests, benchmarks = test_constituents
-            tests_results = cls.parse_tests(tests)
-            bm_results = cls.parse_benchmarks(benchmarks)
+            tests_results = parse_tests(tests)
+            if tests_results != {}:
+                bm_results = parse_benchmarks(benchmarks)
+            else:
+                bm_results = {}
 
             print("Test and Benchmarks - ")
             pprint(tests_results)
@@ -48,42 +94,3 @@ class Utils:
             serial = obj.isoformat()
             return serial
         raise TypeError("Type not serializable")
-
-    @classmethod
-    def parse_tests(cls, tests):
-        tests = tests.strip(" \n")
-
-        # Get the test results
-        tests_list = tests.split("\n")
-        all_test_data = []
-        for i in range(0, len(tests_list) - 1, 2):
-            run_line = tests_list[i].strip(" \n")
-            status_line = tests_list[i+1].strip(" \n")
-
-            test_name = run_line.split(" ")[-1]
-            status_split = status_line.split(" ")
-            status = status_split[1].strip(":")
-            time_taken = status_split[-1].strip("()")
-            all_test_data.append({
-                "test_name": test_name,
-                "status": status,
-                "time_taken": time_taken
-            })
-
-        return all_test_data
-
-    @classmethod
-    def parse_benchmarks(cls, bm):
-        bm = bm.strip(" \n")
-
-        all_bm_data = []
-        for bm_line in bm.split('\n'):
-            bm_line = bm_line.strip(" \n")
-            bm_contents = re.split(r'[\t\s\n]{2,}', bm_line)
-            if len(bm_contents) >= 3:
-                all_bm_data.append({
-                    "bm_name" : bm_contents[0],
-                    "iterations": bm_contents[1],
-                    "rate": bm_contents[2]
-                })
-        return all_bm_data

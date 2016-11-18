@@ -54,7 +54,7 @@ def stats():
 
 if __name__ == "__main__":
     # Just testing out the parser bit
-    ip_str = '''
+    sunny_str = '''
     === RUN   TestBST_integer
     --- PASS: TestBST_integer (0.00s)
     === RUN   TestBST_string
@@ -114,4 +114,41 @@ if __name__ == "__main__":
     Benchmark_strFailSearch-2    	     500	   3688744 ns/op
     ok  	github.com/gnithin/gotree/tree/tests	124.664s
     '''
-    pprint(Utils.parse_content(ip_str, ""))
+
+    rainy_str = '''
+=== RUN   TestBST_integer
+--- FAIL: TestBST_integer (0.00s)
+	assertions.go:225:
+
+	Error Trace:	BST_test.go:25
+
+	Error:		Should be false
+
+=== RUN   TestBST_string
+--- PASS: TestBST_string (0.00s)
+=== RUN   TestBST_customObj
+--- PASS: TestBST_customObj (0.00s)
+=== RUN   TestHeap_loadTesting
+--- PASS: TestHeap_loadTesting (0.00s)
+=== RUN   TestHeap_integer
+--- PASS: TestHeap_integer (0.00s)
+=== RUN   TestHuffman_basic
+--- PASS: TestHuffman_basic (0.00s)
+=== RUN   TestHuffman_lyrics
+--- PASS: TestHuffman_lyrics (0.00s)
+=== RUN   TestTrie_development
+--- PASS: TestTrie_development (0.00s)
+=== RUN   TestTrie_multiple
+--- PASS: TestTrie_multiple (0.00s)
+=== RUN   TestTrie_withOptionsMap
+--- PASS: TestTrie_withOptionsMap (0.00s)
+=== RUN   TestTrie_stopWords
+--- PASS: TestTrie_stopWords (0.00s)
+=== RUN   TestTrie_Insertion
+--- PASS: TestTrie_Insertion (1.64s)
+FAIL
+exit status 1
+FAIL	github.com/gnithin/gotree/tree/tests	1.678s
+    '''
+    # pprint(Utils.parse_content(sunny_str, ""))
+    pprint(Utils.parse_content(rainy_str, ""))
