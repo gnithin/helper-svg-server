@@ -46,6 +46,23 @@ def stats():
 
     return Utils.resp_json(1, "success", contents=test_data)
 
+
+@bottle.error(404)
+def error_404(error):
+    return Utils.resp_json(
+        404,
+        "Page not Found!"
+    )
+
+
+@bottle.error(500)
+def error_500(error):
+    return Utils.resp_json(
+        500,
+        "Something went wrong!"
+
+    )
+
 if __name__ == "__main__":
     # Just testing out the parser bit
     sunny_str = '''
