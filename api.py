@@ -1,4 +1,4 @@
-from lib.bottle import Bottle, request
+from lib.bottle import Bottle, request, response, static_file
 import logging
 from dal import DAL
 from utils import Utils
@@ -7,9 +7,14 @@ from pprint import pprint
 bottle = Bottle()
 
 
+@bottle.route('/static/<file_path:path>', name="static")
+def fetch_static(file_path):
+    return static_file(file_path, root="templates")
+
+
 @bottle.route('/')
 def index():
-    return "Hello world!"
+    return "Round and round it goes!!!"
 
 
 @bottle.route('/post', method="POST")
@@ -44,7 +49,11 @@ def stats():
     if not test_data:
         return Utils.resp_json(-1, "No data available")
 
-    return Utils.resp_json(1, "success", contents=test_data)
+    response.content_type = "image/svg+xml"
+    return Utils.get_template(
+        "stats.html",
+        test_data=test_data
+    )
 
 
 @bottle.error(404)
